@@ -105,8 +105,28 @@ array('11000' ,'15000' ,'2014-04-30')
 
 $categorias = array(7,9,152,157);
 
+$mysql = "
+		select 
+		count(distinct(o.person_id)) Compradores,
+		count(distinct(o.id)) Ordenes
+		from orders o
+		inner join order_detail od on od.order_id = o.id
+		where
+		o.paid_date is not null
+		and o.order_status <> 'CANCELLED'
+		and date(o.paid_date) between '2014-04-01' and '".$today."'
+		";
+		$result_qry=mysql_query($mysql, $link);
+		$rs=mysql_fetch_array($result_qry);
+
+
+
 echo 'Compradores Acumulados ';
 echo "<br> Consulta: ".date("Y-m-d");
+echo "<br>";
+echo 'Compradores Acumulados financieros: '.number_format($rs['Compradores']);
+echo "<br>";
+echo 'Ordenes Acumuladas financieros: '.number_format($rs['Ordenes']);
 
 	echo '<table border=1> ';
 	
@@ -118,7 +138,7 @@ echo "<br> Consulta: ".date("Y-m-d");
 	foreach($semanas as $semana){ 
 
 		$mysql = "
-				select 
+		select 
 		count(distinct(o.person_id)) Compradores
 		from orders o
 		inner join order_detail od on od.order_id = o.id
